@@ -20,3 +20,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+tasks.create("stage"){
+    dependsOn("build", "clean");
+}
+
