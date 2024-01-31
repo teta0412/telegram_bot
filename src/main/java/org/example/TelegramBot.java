@@ -19,7 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
 
 public class TelegramBot extends TelegramLongPollingBot{
     private static final String API_KEY = "40caee4d06d344b1a50fb2d90dc1e0fb";

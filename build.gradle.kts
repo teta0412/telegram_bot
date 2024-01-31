@@ -1,3 +1,6 @@
+import org.gradle.internal.impldep.org.codehaus.plexus.util.FileUtils.rename
+import org.gradle.internal.impldep.org.eclipse.jgit.lib.ObjectChecker.type
+
 plugins {
     id("java")
 }
