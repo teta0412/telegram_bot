@@ -1,114 +1,105 @@
 package org.example;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.example.Handler.AIHandler;
+import org.example.Handler.InfoHandler;
+import org.example.Handler.P2PHandler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
-public class TelegramBot extends TelegramLongPollingBot{
-    private static final String API_KEY = "40caee4d06d344b1a50fb2d90dc1e0fb";
-    private static final String BASE_URL = "https://newsapi.org/v2/";
+public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            {
-                // Set variables
-                String message_text = update.getMessage().getText();
-                long chat_id = update.getMessage().getChatId();
-                if (message_text.equals("/start")) {
-                    // User send /start
-                    SendMessage message = new SendMessage(); // Create a message object object
-                    message.setChatId(chat_id);
-                    message.setText("Click");
+            //Logging
+            String user_username = update.getMessage().getChat().getUserName();
+            long user_id = update.getMessage().getChatId();
+            String msg_text = update.getMessage().getText();
 
-                    ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+            String answer ="";
 
-                    List<KeyboardRow> keyboardList = new ArrayList<>();
+            if (msg_text.equals("/start")) {
+                SendMessage msg_send = new SendMessage(
+                        Long.toString(user_id),
+                        "Welcome to Teta Bot !! \n"
+                                + "List of commands you can use \n" +
+                                "/info : info of a specific cryptocurrency \n" +
+                                "/p2p : p2p rate of USDT/VND pair at the moment\n" +
+                                "/generate : generate a text to image \n" +
+                                "\n" +
+                                "-----------------------------------------------\n"+
+                                "Developed by https://t.me/teta412 \n" +
+                                "Invited link : https://t.me/TetaNewsBot"
 
-                    KeyboardRow row = new KeyboardRow();
-                    row.add("Hello");
-                    row.add("IT News");
-                    row.add("Crypto News");
-                    keyboardList.add(row);
-                    keyboardMarkup.setKeyboard(keyboardList);
-                    message.setReplyMarkup(keyboardMarkup);
-                    try {
-                        execute(message); // Sending our message object to user
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
-                } else if (message_text.equals("Hello")) {
-                    // User sent /pic
-                    String f_id = "AgACAgUAAxkBAAMrZbNvSsvf9bnDFVTEN9KWRT-o31AAAiy7MRvUlphVQv5Ot0XM5HABAAMCAAN4AAM0BA";
-                    SendPhoto msg = new SendPhoto();
-                    msg.setChatId(chat_id);
-                    msg.setPhoto(new InputFile(f_id));
-                    msg.setCaption("Hello Bro");
-                    try {
-                        execute(msg); // Call method to send the photo
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
-                } else if (message_text.equals("IT News")) {
-                    String endpoint = "everything";
-                    String domain = "";
-                    String pageSize="";
-                    String url = BASE_URL + endpoint +"?domains=techcrunch.com"+ "&apiKey=" + API_KEY +"&pageSize=5" ;
-                    SendMessage message = new SendMessage();
-                    try {
-                        JSONObject response = makeHttpRequest(url);
-                        JSONArray articles = response.getJSONArray("articles");
-                        List<String> headlines = new ArrayList<>();
-                        for (int i = 0; i < articles.length(); i++) {
-                            JSONObject article = articles.getJSONObject(i);
-                            String title = article.getString("title");
-                            String sources_url = article.getString("url");
-                            message.setChatId(chat_id);
-                            message.setText(title + "\n" +sources_url);
-                            execute(message);
-                        }
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    // Unknown command
-                    SendMessage message = new SendMessage();// Create a message object object
-                    message.setChatId(chat_id);
-                    message.setText("Unknown command");
-                    try {
-                        execute(message); // Sending our message object to user
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
+                );
+                answer = msg_send.getText();
+                try {
+                    execute(msg_send);
+                } catch (Exception e) {
+                    return;
                 }
             }
+            if (msg_text.equals("/p2p")) {
+                String result = new P2PHandler().p2pResult();
+                SendMessage msg_send = new SendMessage(Long.toString(user_id),result);
+                answer = msg_send.getText();
+                try {
+                    execute(msg_send);
+                } catch (Exception e){
+                    return;
+                }
+            }
+            if (msg_text.startsWith("/info")) {
+                String tmp = msg_text.substring("/info".length()).trim();
+                String result = new InfoHandler().infoResult(tmp.toUpperCase().trim());
+                SendMessage msg_send = new SendMessage(Long.toString(user_id),result);
+                answer = msg_send.getText();
+                try {
+                    execute(msg_send);
+                } catch (Exception e){
+                    return;
+                }
+            }
+            if (msg_text.startsWith("/generate")){
+                String tmp = msg_text.substring("/generate".length()).trim();
+                String result = new AIHandler().generateImage(tmp);
+                try {
+                    InputStream inputStream = new URL(result).openStream();
+                    Path tempFile = Files.createTempFile("temp-photo", ".jpg");
+                    Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                    SendPhoto sendPhoto = new SendPhoto();
+                    sendPhoto.setChatId(user_id);
+                    sendPhoto.setPhoto(new InputFile(tempFile.toFile()));
+                    sendPhoto.setCaption("Generated Image");
+                    try {
+                        execute(sendPhoto);
+                        Files.deleteIfExists(tempFile);
+                    } catch (Exception e){
+                        return;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                answer = "Generated Image";
+            }
+
+            log(user_username, Long.toString(user_id), msg_text, answer);
         }
-
-
     }
-
-
     @Override
     public String getBotUsername() {
         return System.getenv("TELE_USERNAME");
@@ -118,26 +109,13 @@ public class TelegramBot extends TelegramLongPollingBot{
     public String getBotToken() {
         return System.getenv("TELE_TOKEN");
     }
-
-    private static JSONObject makeHttpRequest(String url) throws IOException, JSONException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.setRequestMethod("GET");
-
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-
-            reader.close();
-            return new JSONObject(response.toString());
-        } else {
-            throw new IOException("HTTP request failed with code: " + responseCode);
-        }
+    private void log(String user_name, String user_id, String txt, String bot_answer) {
+        System.out.println("\n ----------------------------");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        System.out.println(dateFormat.format(date));
+        System.out.println("Message from " + user_name + ". (id = " + user_id + ") \n Text - " + txt);
+        System.out.println("Bot answer: \n Text - " + bot_answer);
     }
 
 }

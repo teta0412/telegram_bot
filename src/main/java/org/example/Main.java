@@ -10,11 +10,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-//        newsapi = 40caee4d06d344b1a50fb2d90dc1e0fb
                 try {
                     TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
                     telegramBotsApi.registerBot(new TelegramBot());
-//                    telegramBotsApi.registerBot(new HelloBot());
 
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
