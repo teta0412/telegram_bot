@@ -12,7 +12,7 @@ import java.net.http.HttpResponse;
 import java.text.DecimalFormat;
 
 public class AIHandler {
-    String api_key = "lmwr_sk_CVF64XugZg_jTsnlr53K8tm213ZKz3Np7U1ymKHjMLobqsDn";
+    String api_key = System.getenv("LIMEWIREAI_API_KEY");
     String apiUrl = "https://api.limewire.com/api/image/generation";
 
     OkHttpClient client = new OkHttpClient();

@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
 
 public class InfoHandler {
         OkHttpClient client = new OkHttpClient();
-        String apiKey = "f45f935f-7cfc-474b-85a1-98049383f5f4";
+        String apiKey = System.getenv("CMC_API_KEY");
         public String infoResult (String symbol){
             String result = "";
             Request request = new Request.Builder()
