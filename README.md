@@ -1,12 +1,15 @@
 # Telegram Bot
 
 This Telegram bot allows users to interact with various APIs to discover stuffs.
+Try out this bot : Here(https://t.me/TetaNewsBot)
 
 ## Commands
 
 - `/info`: Interact with Coinmarketcap API to get information about a specific cryptocurrency.
 - `/p2p`: Interact with Coingecko API to get information about USDT/VND rate .
 - `/generate`: Generate an image from text using LimeWire AI API.
+- `/shorten`: Shorten given link using spoo.me.
+- Still updating
 
 ## Setup
 
